@@ -60,20 +60,24 @@ app.post("/create-checkout-session", async (req, res) => {
     return {
       ...PRODUCT_LIST[id],
       quantity: quantity,
-      currency: 'usd',
+      currency: 'eur',
     }
   });
 
+
+  // https://site-admin.stripe.com/docs/payments/checkout/connect#direct-charges
   // Create new Checkout session
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
+    payment_method_types: ["card", "ideal", "bancontact"],
     shipping_address_collection: {
-      allowed_countries: ['US'],
+      allowed_countries: ['US','NL', 'BE'],
     },
     line_items: lineItems,
     // ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
     success_url: `${domainUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${domainUrl}`,
+  }, {
+    stripeAccount: process.env.STRIPE_CONNECTED_ACCOUNT_ID,
   });
 
   res.json({
