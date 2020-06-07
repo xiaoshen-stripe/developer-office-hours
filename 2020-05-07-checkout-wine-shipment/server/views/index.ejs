@@ -48,7 +48,9 @@
     </div>
 
     <script>
-      const stripe = Stripe('pk_test_254YMVH1T73Zf6tG4quL78KX00VCYOdZPx');
+      const stripe = Stripe('pk_test_hKnxuMssP5ake8fyO674QBi100SK0c1Qfx', {
+        stripeAccount: 'acct_1Gnyp9FEOafZSXoi'
+      });
 
       // Keys: product ids. Values: quantity.
       const productSelections = {};
