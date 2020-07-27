@@ -11,21 +11,21 @@ const PRODUCT_LIST = {
   a: {
     name: 'Red wine',
     description: 'A full-bodied red',
-    amount: 1500,
+    amount: 100,
     // Photo by Kelsey Knight on Unsplash
     images: ['https://i.imgur.com/PRUuYjE.jpg']
   },
   b: {
     name: 'White wine',
     description: 'The perfect white wine for your summer barbecues',
-    amount: 1200,
+    amount: 100,
     // Photo by Matthieu Joannon on Unsplash
     images: ['https://i.imgur.com/MR3CucS.jpg']
   },
   c: {
     name: 'Grab bag case',
     description: 'A wine omakase. This is a cost-effective case of our current favorites.',
-    amount: 9900,
+    amount: 100,
     // Photo by chuttersnap on Unsplash
     images: ['https://i.imgur.com/IHOSKqR.jpg']
   }
@@ -60,7 +60,7 @@ app.post("/create-checkout-session", async (req, res) => {
     return {
       ...PRODUCT_LIST[id],
       quantity: quantity,
-      currency: 'eur',
+      currency: 'cad',
     }
   });
 
@@ -68,17 +68,26 @@ app.post("/create-checkout-session", async (req, res) => {
   // https://site-admin.stripe.com/docs/payments/checkout/connect#direct-charges
   // Create new Checkout session
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card", "ideal", "bancontact"],
+    payment_method_types: ["alipay"],
     shipping_address_collection: {
-      allowed_countries: ['US','NL', 'BE'],
+      allowed_countries: ['US', 'CA'],
     },
     line_items: lineItems,
     // ?session_id={CHECKOUT_SESSION_ID} means the redirect will have the session ID set as a query param
     success_url: `${domainUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${domainUrl}`,
-  }, {
-    stripeAccount: process.env.STRIPE_CONNECTED_ACCOUNT_ID,
-  });
+  },);
+
+// curl https://api.stripe.com/v1/checkout/sessions \
+//   -u sk_test_6QKraA1yjDb38C8EvktbbLHh: \
+//   -d "payment_method_types[]"=card \
+//   -d "line_items[][price]"="{{PRICE_ID}}" \
+//   -d "line_items[][quantity]"=1 \
+//   -d mode=payment \
+//   -d success_url="https://example.com/success?session_id={CHECKOUT_SESSION_ID}" \
+//   -d cancel_url="https://example.com/cancel"
+
+
 
   res.json({
     sessionId: session.id,
